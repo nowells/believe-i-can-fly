@@ -218,9 +218,9 @@ PILOT_ACCELERATION = 0.04;
                       speed : 0
                   });
                 } else { // hovering state if no more active commands
-                  this.cockpit.socket.emit("/pilot/drone", {
-                      action : 'stop'
-                  });
+                  //this.cockpit.socket.emit("/pilot/drone", {
+                      //action : 'stop'
+                  //});
                 }
         }
 

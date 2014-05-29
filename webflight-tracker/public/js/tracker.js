@@ -43,25 +43,28 @@
             moveX, moveY, moveVert, lastXCommand, lastYCommand, lastVertCommand;
 
         this.cockpit.socket.on('navdata', function(data) {
+            if (!data || !data.demo) {
+                return;
+            }
             var altitude = data.demo.altitudeMeters,
                 currentTime = (new Date()).getTime();
 
-            if (altitude > .304 && (moveVert !== 'down' || (currentTime - lastVertCommand > 3000))) {
+            if (altitude > .4 && (moveVert !== 'down' || (currentTime - lastVertCommand > 3000))) {
                 moveVert = 'down';
                 lastVertCommand = currentTime;
                 cockpit.socket.emit("/pilot/move", {
                     action : moveVert,
-                    speed : 0.2
+                    speed : 0.1
                 });
                 console.log(moveVert, data.demo.altitudeMeters);
             }
 
-            if (altitude < .152 && (moveVert !== 'up' || (currentTime - lastVertCommand > 3000))) {
+            if (altitude < .2 && (moveVert !== 'up' || (currentTime - lastVertCommand > 3000))) {
                 moveVert = 'up';
                 lastVertCommand = currentTime;
                 cockpit.socket.emit("/pilot/move", {
                     action : moveVert,
-                    speed : 0.2
+                    speed : 0.1
                 });
                 console.log(moveVert, data.demo.altitudeMeters);
             }
@@ -96,7 +99,7 @@
                 if (moveX) {
                     cockpit.socket.emit("/pilot/move", {
                         action : moveX,
-                        speed : 0.2
+                        speed : 0.1
                     });
                 }
                 console.log(moveX);
@@ -109,7 +112,7 @@
                 if (moveY) {
                     cockpit.socket.emit("/pilot/move", {
                         action : moveY,
-                        speed : 0.2
+                        speed : 0.1
                     });
                 }
                 console.log(moveY);
@@ -125,6 +128,10 @@
 
         this.on('locked', function () {
             console.log('target acquired');
+            cockpit.socket.emit("/pilot/move", {
+                action : 'front',
+                speed : 0.1
+            });
         });
 
         this.on('lost', function () {
