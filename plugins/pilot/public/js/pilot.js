@@ -232,6 +232,7 @@ PILOT_ACCELERATION = 0.04;
                 for (var k in this.keys) {
                     var cmd = Keymap[k];
                     // Send the command
+                    console.log(cmd, this.keys[k]);
                     this.cockpit.socket.emit("/pilot/" + cmd.ev, {
                         action : cmd.action,
                         speed : this.keys[k]

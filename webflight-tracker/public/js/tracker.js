@@ -39,10 +39,49 @@
         this.crosshairs = $('#tracker-crosshairs').get(0);
         this.crosshairs.style.display = 'none';
 
+        var cockpit = this.cockpit;
+
         this.on('points', function (data) {
             tracker.crosshairs.style.left = (data[0].x - 83) + 'px';
             tracker.crosshairs.style.top = (data[0].y - 83 ) + 'px';
             tracker.crosshairs.style.display = 'block';
+
+            console.log(data[0]);
+
+            var centerX = window.innerWidth / 2,
+                centerY = window.innerHeight / 2,
+                threshold = 50,
+                moveX, moveY;
+
+            if (centerX - data[0].x > threshold) {
+                moveX = 'left';
+            }
+            else if (centerX - data[0].x < -threshold) {
+                moveX = 'right';
+            }
+
+            if (centerY - data[0].y > threshold) {
+                moveY = 'up';
+            }
+            else if (centerY - data[0].y < -threshold) {
+                moveY = 'down';
+            }
+
+            if (moveX) {
+                console.log(moveX);
+                cockpit.socket.emit("/pilot/move", {
+                    action : moveX,
+                    speed : 0.04
+                });
+            }
+
+            if (moveY) {
+                console.log(moveY);
+                cockpit.socket.emit("/pilot/move", {
+                    action : moveY,
+                    speed : 0.04
+                });
+            }
         });
 
         this.on('locked', function () {
