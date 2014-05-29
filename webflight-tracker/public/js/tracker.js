@@ -2,6 +2,7 @@
     'use strict';
 
     var Tracker = function Tracker(cockpit) {
+        var maxHeight = 0.4;
         var tracker = this;
         console.log('Loading Tracker plugin');
         this.cockpit = cockpit;
@@ -42,14 +43,22 @@
         var cockpit = this.cockpit,
             moveX, moveY, moveVert, lastXCommand, lastYCommand, lastVertCommand;
 
-        tracker.setTrackingCoords(window.innerWidth / 2, window.innerHeight / 2);
         cockpit.socket.emit("/pilot/drone", {
             action : 'takeoff'
         });
-        cockpit.socket.emit("/pilot/move", {
-            action : 'front',
-            speed : 0.03
-       });
+
+        function centerStart() {
+           tracker.setTrackingCoords(window.innerWidth / 2, window.innerHeight / 2);
+           cockpit.socket.emit("/pilot/drone", {
+             action : 'stop'
+           });
+           cockpit.socket.emit("/pilot/move", {
+             action : 'front',
+             speed : 0.03
+           });
+        }
+
+        centerStart();
 
         this.cockpit.socket.on('navdata', function(data) {
             if (!data || !data.demo) {
@@ -58,7 +67,7 @@
             var altitude = data.demo.altitudeMeters,
                 currentTime = (new Date()).getTime();
 
-            if (altitude > .4 && (moveVert !== 'down' || (currentTime - lastVertCommand > 3000))) {
+            if (altitude > maxHeight && (moveVert !== 'down' || (currentTime - lastVertCommand > 3000))) {
                 moveVert = 'down';
                 lastVertCommand = currentTime;
                 cockpit.socket.emit("/pilot/move", {
@@ -148,9 +157,18 @@
             tracker.crosshairs.style.display = 'none';
             tracker.disable();
 
+            setTimeout(function() {
+               maxHeight = .4;
+               centerStart();
+            }, 2000);
+            maxHeight = 2;
             cockpit.socket.emit("/pilot/move", {
                 action : 'back',
-                speed : 0.2
+                speed : 1
+            });
+            cockpit.socket.emit("/pilot/move", {
+                action : 'up',
+                speed : .5
             });
         });
     };
