@@ -1,23 +1,20 @@
 {
   "name": "believe-i-can-fly",
   "version": "0.0.0",
-  "description": "believe-i-can-fly =================",
-  "main": "index.js",
+  "main": "app.js",
+  "dependencies": {
+    "dronestream": "git://github.com/felixge/node-dronestream.git#soccer",
+    "send": "^0.3.0",
+    "ws": "^0.4.31",
+    "starfox": "^0.0.1",
+    "ar-drone": "^0.3.2"
+  },
+  "devDependencies": {
+    "jshint": "^2.5.0",
+    "browserify": "^4.1.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nowells/believe-i-can-fly.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/nowells/believe-i-can-fly/issues"
-  },
-  "homepage": "https://github.com/nowells/believe-i-can-fly",
-  "dependencies": {
-    "ar-drone": "^0.3.2",
-    "starfox": "^0.0.1"
-  }
+  "license": "MIT"
 }
