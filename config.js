@@ -7,7 +7,8 @@ var config = {
           , "pilot"         // Pilot the drone with the keyboard
           , "blackbox"      // Experimental: Records all mision data (navData, raw video, PaVE headers, etc.)
         //, "replay"        // Experimental: Replay the data recorded by the blackbox
-          , "gamepad"
+          , "gamepad",
+          , "tracker"
         ],
 
         // Config for pilot plugin
