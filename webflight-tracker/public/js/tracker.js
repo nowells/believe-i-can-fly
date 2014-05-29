@@ -40,14 +40,37 @@
         this.crosshairs.style.display = 'none';
 
         var cockpit = this.cockpit,
-            moveX, moveY, lastXCommand, lastYCommand;
+            moveX, moveY, moveVert, lastXCommand, lastYCommand, lastVertCommand;
+
+        this.cockpit.socket.on('navdata', function(data) {
+            var altitude = data.demo.altitudeMeters,
+                currentTime = (new Date()).getTime();
+
+            if (altitude > .304 && (moveVert !== 'down' || (currentTime - lastVertCommand > 3000))) {
+                moveVert = 'down';
+                lastVertCommand = currentTime;
+                cockpit.socket.emit("/pilot/move", {
+                    action : moveVert,
+                    speed : 0.2
+                });
+                console.log(moveVert, data.demo.altitudeMeters);
+            }
+
+            if (altitude < .152 && (moveVert !== 'up' || (currentTime - lastVertCommand > 3000))) {
+                moveVert = 'up';
+                lastVertCommand = currentTime;
+                cockpit.socket.emit("/pilot/move", {
+                    action : moveVert,
+                    speed : 0.2
+                });
+                console.log(moveVert, data.demo.altitudeMeters);
+            }
+        });
 
         this.on('points', function (data) {
             tracker.crosshairs.style.left = (data[0].x - 83) + 'px';
             tracker.crosshairs.style.top = (data[0].y - 83 ) + 'px';
             tracker.crosshairs.style.display = 'block';
-
-            console.log(data[0]);
 
             var centerX = window.innerWidth / 2,
                 centerY = window.innerHeight / 6,
@@ -62,10 +85,7 @@
                 newMoveX = 'right';
             }
 
-            if (centerY - data[0].y > threshold) {
-                newMoveY = 'back';
-            }
-            else if (centerY - data[0].y < -threshold) {
+            if (!newMoveX) {
                 newMoveY = 'front';
             }
 
@@ -76,7 +96,7 @@
                 if (moveX) {
                     cockpit.socket.emit("/pilot/move", {
                         action : moveX,
-                        speed : 0.1
+                        speed : 0.2
                     });
                 }
                 console.log(moveX);
@@ -89,7 +109,7 @@
                 if (moveY) {
                     cockpit.socket.emit("/pilot/move", {
                         action : moveY,
-                        speed : 0.1
+                        speed : 0.2
                     });
                 }
                 console.log(moveY);
@@ -111,6 +131,11 @@
             console.log('target lost');
             tracker.crosshairs.style.display = 'none';
             tracker.disable();
+
+            cockpit.socket.emit("/pilot/move", {
+                action : 'back',
+                speed : 0.2
+            });
         });
     };
 
