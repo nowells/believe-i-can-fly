@@ -1,1 +1,8 @@
-/node_modules
+*.swp
+.DS_Store
+.project
+.settings
+config.js
+_site
+pictures
+temp.js
