@@ -42,6 +42,15 @@
         var cockpit = this.cockpit,
             moveX, moveY, moveVert, lastXCommand, lastYCommand, lastVertCommand;
 
+        tracker.setTrackingCoords(window.innerWidth / 2, window.innerHeight / 2);
+        cockpit.socket.emit("/pilot/drone", {
+            action : 'takeoff'
+        });
+        cockpit.socket.emit("/pilot/move", {
+            action : 'front',
+            speed : 0.03
+       });
+
         this.cockpit.socket.on('navdata', function(data) {
             if (!data || !data.demo) {
                 return;

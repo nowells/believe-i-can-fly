@@ -74,6 +74,7 @@ client.config('general:navdata_options', navdata_options);
 // Add a handler on navdata updates
 var latestNavData;
 client.on('navdata', function (d) {
+    //console.log(d);
     latestNavData = d;
 });
 
