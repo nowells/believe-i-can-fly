@@ -39,7 +39,8 @@
         this.crosshairs = $('#tracker-crosshairs').get(0);
         this.crosshairs.style.display = 'none';
 
-        var cockpit = this.cockpit;
+        var cockpit = this.cockpit,
+            moveX, moveY, lastXCommand, lastYCommand;
 
         this.on('points', function (data) {
             tracker.crosshairs.style.left = (data[0].x - 83) + 'px';
@@ -49,38 +50,56 @@
             console.log(data[0]);
 
             var centerX = window.innerWidth / 2,
-                centerY = window.innerHeight / 2,
-                threshold = 50,
-                moveX, moveY;
+                centerY = window.innerHeight / 6,
+                threshold = 10,
+                currentTime = (new Date()).getTime(),
+                newMoveX, newMoveY;
 
             if (centerX - data[0].x > threshold) {
-                moveX = 'left';
+                newMoveX = 'left';
             }
             else if (centerX - data[0].x < -threshold) {
-                moveX = 'right';
+                newMoveX = 'right';
             }
 
             if (centerY - data[0].y > threshold) {
-                moveY = 'up';
+                newMoveY = 'back';
             }
             else if (centerY - data[0].y < -threshold) {
-                moveY = 'down';
+                newMoveY = 'front';
             }
 
-            if (moveX) {
+            if (newMoveX !== moveX || (currentTime - lastXCommand) > 3000) {
+                moveX = newMoveX;
+                lastXCommand = currentTime;
+
+                if (moveX) {
+                    cockpit.socket.emit("/pilot/move", {
+                        action : moveX,
+                        speed : 0.1
+                    });
+                }
                 console.log(moveX);
-                cockpit.socket.emit("/pilot/move", {
-                    action : moveX,
-                    speed : 0.04
-                });
             }
 
-            if (moveY) {
+            if (newMoveY !== moveY || (currentTime - lastYCommand) > 3000) {
+                moveY = newMoveY;
+                lastYCommand = currentTime;
+
+                if (moveY) {
+                    cockpit.socket.emit("/pilot/move", {
+                        action : moveY,
+                        speed : 0.1
+                    });
+                }
                 console.log(moveY);
-                cockpit.socket.emit("/pilot/move", {
-                    action : moveY,
-                    speed : 0.04
-                });
+            }
+
+            if (!moveX && !moveY) {
+                //cockpit.socket.emit("/pilot/drone", {
+                    //action : 'stop'
+                //});
+                //console.log('stop');
             }
         });
 
